@@ -20,7 +20,7 @@ jobs:
     steps: 
     - name: Configure Tor
       run: |
-        docker exec -it 10 bash -c "printf 'ControlPort 9051\nCookieAuthentication 1\nStrictNodes 1\nExitNodes {il}' > /etc/tor/torrc"
+        docker exec -it proxy bash -c "printf 'ControlPort 9051\nCookieAuthentication 1\nStrictNodes 1\nExitNodes {il}' > /etc/tor/torrc"
 
     - name: Restart tor
       run: |
