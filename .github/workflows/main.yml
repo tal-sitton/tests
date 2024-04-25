@@ -1,0 +1,39 @@
+name: Tor Proxy Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      tor-proxy:
+        image: dperson/torproxy
+        ports:
+          - 8118:8118
+        options: >-
+          --name proxy
+          --health-cmd "curl -x socks5h://localhost:9050 -s https://check.torproject.org/api/ip | grep \"IsTor\":true"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+          --health-start-period 20s
+    
+    steps: 
+    - name: Configure Tor
+      run: |
+        docker exec -it 10 bash -c "printf 'ControlPort 9051\nCookieAuthentication 1\nStrictNodes 1\nExitNodes {il}' > /etc/tor/torrc"
+
+    - name: Restart tor
+      run: |
+        docker restart proxy
+        timeout 75s sh -c 'until docker ps | grep proxy | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 5; done'
+      
+    - name: Run regular wtfismyip
+      run: curl https://wtfismyip.com/json
+      
+    - name: Run proxified wtfismyip
+      run: curl -Lx http://localhost:8118 https://wtfismyip.com/json
