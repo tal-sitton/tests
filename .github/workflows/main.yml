@@ -11,7 +11,7 @@ jobs:
     
     services:
       proxy-vpn:
-        image: ghcr.io/tal-sitton/proxy-vpn:latest
+        image: ghcr.io/tal-sitton/proxy-vpn:test
         ports:
           - 8118:8118
         env:
