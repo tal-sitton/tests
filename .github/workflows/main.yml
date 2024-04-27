@@ -8,27 +8,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     services:
-      tor-proxy:
-        image: dperson/torproxy
+      proxy-vpn:
+        image: ghcr.io/tal-sitton/proxy-vpn:latest
         ports:
           - 8118:8118
         options: >-
           --name proxy
-    
-    steps: 
-    - name: Configure Tor
-      run: |
-        docker exec proxy bash -c "printf 'ControlPort 9051\nCookieAuthentication 1\nStrictNodes 1\nExitNodes {il}' > /etc/tor/torrc"
-
-    - name: Restart tor
-      run: |
-        docker restart proxy
-        timeout 75s sh -c 'until docker ps | grep proxy | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 5; done'
+          --privileged
+          
+    steps:
+      - name: Run regular wtfismyip
+        run: curl https://wtfismyip.com/json
       
-    - name: Run regular wtfismyip
-      run: curl https://wtfismyip.com/json
-      
-    - name: Run proxified wtfismyip
-      run: curl -Lx http://localhost:8118 https://wtfismyip.com/json
+      - name: Run proxified wtfismyip
+        run: curl -Lx http://localhost:8118 https://wtfismyip.com/json
