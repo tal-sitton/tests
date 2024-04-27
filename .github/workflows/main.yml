@@ -14,6 +14,9 @@ jobs:
         image: ghcr.io/tal-sitton/proxy-vpn:latest
         ports:
           - 8118:8118
+        env:
+          PASTE_DEV_KEY: "$PASTE_DEV_KEY"
+          PASTE_USER_KEY: "$PASTE_USER_KEY"
         options: >-
           --name proxy
           --privileged
